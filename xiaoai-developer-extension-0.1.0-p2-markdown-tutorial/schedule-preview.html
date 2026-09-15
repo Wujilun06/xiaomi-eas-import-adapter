@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>周课表 - 小爱伴侣-开发者工具</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body class="schedule-preview-page">
+    <header class="app-header preview-header">
+      <div class="brand">
+        <img class="brand-mark" src="icons/icon-128.png" alt="" />
+        <div class="brand-copy">
+          <h1>周课表</h1>
+          <p>小爱伴侣-开发者工具</p>
+        </div>
+      </div>
+    </header>
+    <main class="preview-main">
+      <div class="preview-heading">
+        <div>
+          <h2>课表结果</h2>
+          <p>此页面读取当前浏览器会话中的测试结果。</p>
+        </div>
+      </div>
+      <div id="week-schedule" class="week-schedule">
+        <p class="result-empty">正在读取课表结果…</p>
+      </div>
+    </main>
+    <script type="module" src="schedule-preview.js"></script>
+  </body>
+</html>

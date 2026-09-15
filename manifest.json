@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 4,
+  "dialect": "xiaoai-legacy",
+  "id": "hdu-undergrad-newjw",
+  "version": "1.0.0",
+  "developer": "<请替换为你的小爱伴侣开发者标识，如 QQ 号>",
+  "schoolIds": [
+    "<请替换为平台分配给杭电的 schoolId；在开发者工具创建学校项目后由平台给出>"
+  ],
+  "systemTypes": [
+    "本科教务(正方)"
+  ],
+  "origins": [
+    "https://newjw.hdu.edu.cn"
+  ],
+  "capabilities": [
+    "dom",
+    "fetch",
+    "sameOrigin"
+  ],
+  "fixtureFiles": [],
+  "sources": {
+    "repository": "<请替换为你的源码仓库地址，如 https://gitee.com/yourname/xiaoai-hdu>"
+  },
+  "files": {
+    "provider.js": "e8e8f4599610c45a677bdca78dd7c257403720c5974414266dcb858f629e76e9",
+    "parser.js": "af2b2fd288efccc371bf93cf316b3bcc34622c82479605f5036637d644309b08",
+    "timer.js": "8d554c9745606ec6e4bafa474b2e4267883783a00fa3c4821d36096be253340d"
+  },
+  "license": "MIT",
+  "minAppVersion": "1.0.0",
+  "semesterStartPolicy": {
+    "type": "prompt",
+    "promptText": "请输入本学期开学日期（如 2026-02-23），用于计算当前周次"
+  },
+  "entrypoints": {
+    "provider": "provider.js",
+    "parser": "parser.js",
+    "timer": "timer.js"
+  }
+}

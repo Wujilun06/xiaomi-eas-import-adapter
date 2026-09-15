@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小爱伴侣-开发者工具</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <button id="home-back" class="icon-command" type="button" aria-label="返回适配器首页" title="返回" hidden>
+        <i data-lucide="arrow-left" aria-hidden="true"></i>
+      </button>
+      <div class="brand">
+        <img class="brand-mark" src="icons/icon-128.png" alt="" />
+        <div class="brand-copy">
+          <h1 id="header-title">小爱伴侣-开发者工具</h1>
+          <p id="header-subtitle">让课表适配更简单</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span id="header-lifecycle" class="status-badge status-draft" hidden>开发中</span>
+        <p id="status" role="status" aria-live="polite" title="可以开始编写了" hidden>
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="status-short">未运行</span>
+          <span class="status-text sr-only">可以开始编写了</span>
+        </p>
+        <button id="edit-info" class="header-edit" type="button" title="编辑适配器信息" hidden>
+          <i data-lucide="pencil" aria-hidden="true"></i><span>编辑信息</span>
+        </button>
+        <div id="account-summary" class="account-summary" hidden>
+          <img id="user-avatar" alt="" />
+          <span id="user-name"></span>
+        </div>
+        <button id="more-toggle" class="icon-command" type="button" aria-label="更多操作" title="更多操作" aria-haspopup="menu" aria-expanded="false">
+          <i data-lucide="ellipsis-vertical" aria-hidden="true"></i>
+        </button>
+        <div id="more-menu" class="more-menu" role="menu" hidden>
+          <button id="menu-import" class="menu-item" type="button" role="menuitem"><i data-lucide="folder-up" aria-hidden="true"></i>导入项目</button>
+          <button id="menu-copy" class="menu-item workspace-command" type="button" role="menuitem"><i data-lucide="copy-plus" aria-hidden="true"></i>复制适配器</button>
+          <button id="menu-export" class="menu-item workspace-command" type="button" role="menuitem"><i data-lucide="download" aria-hidden="true"></i>导出项目</button>
+          <button id="menu-delete" class="menu-item workspace-command danger" type="button" role="menuitem"><i data-lucide="trash-2" aria-hidden="true"></i>删除适配器</button>
+          <span class="menu-divider" role="separator"></span>
+          <button id="theme-toggle" class="menu-item" type="button" role="menuitem"><i data-lucide="sun-moon" aria-hidden="true"></i><span>切换主题</span></button>
+          <button id="sync-qq-profile" class="menu-item" type="button" role="menuitem">
+            <i data-lucide="refresh-cw" aria-hidden="true"></i><span>同步 QQ 资料</span>
+          </button>
+          <p id="profile-sync-feedback" class="menu-feedback" role="status" aria-live="polite"></p>
+          <button id="logout" class="menu-item" type="button" role="menuitem"><i data-lucide="log-out" aria-hidden="true"></i>退出登录</button>
+        </div>
+      </div>
+    </header>
+
+    <section id="startup-loading" class="startup-loading" role="status" aria-live="polite">
+      <span class="loading-spinner" aria-hidden="true"></span>
+      <p id="startup-loading-text">正在加载适配器…</p>
+      <button id="startup-retry" class="secondary" type="button" hidden>重新加载</button>
+    </section>
+
+    <section id="auth-gate" class="auth-gate" aria-labelledby="auth-heading" hidden>
+      <i data-lucide="mail" aria-hidden="true"></i>
+      <h2 id="auth-heading">登录开发者工具</h2>
+      <p>验证码将发送到 QQ 号对应的 QQ 邮箱。</p>
+      <form id="auth-qq-step" class="auth-form">
+        <label for="qq-number">QQ 号</label>
+        <input
+          id="qq-number"
+          type="text"
+          inputmode="numeric"
+          autocomplete="username"
+          pattern="[1-9][0-9]{4,11}"
+          maxlength="12"
+          placeholder="请输入 QQ 号"
+          required
+        />
+        <button id="send-qq-code" type="submit"><i data-lucide="send" aria-hidden="true"></i><span>发送验证码</span></button>
+      </form>
+      <form id="auth-code-step" class="auth-form" hidden>
+        <p id="auth-destination" class="auth-destination"></p>
+        <label for="qq-code">邮箱验证码</label>
+        <input
+          id="qq-code"
+          type="text"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          placeholder="6 位验证码"
+          required
+        />
+        <button id="verify-qq-code" type="submit"><i data-lucide="log-in" aria-hidden="true"></i>验证并登录</button>
+        <div class="auth-secondary-actions">
+          <button id="change-qq" class="text-command" type="button"><i data-lucide="arrow-left" aria-hidden="true"></i>更换 QQ 号</button>
+          <button id="resend-qq-code" class="text-command" type="button"><i data-lucide="refresh-cw" aria-hidden="true"></i><span>重新发送</span></button>
+        </div>
+      </form>
+      <p id="auth-error" class="inline-error" role="alert"></p>
+    </section>
+
+    <main id="home-view" class="home-view" hidden>
+      <div class="home-heading">
+        <div><h2>我的适配器</h2><p>选择一个继续开发，或创建新的适配器</p></div>
+        <button id="home-new" type="button"><i data-lucide="circle-plus" aria-hidden="true"></i>新建适配器</button>
+      </div>
+      <div id="adapter-list" class="adapter-list" aria-live="polite"></div>
+      <div id="submission-pagination" class="submission-pagination" hidden>
+        <button id="load-more-submissions" class="secondary" type="button">加载更多</button>
+        <p id="submission-page-error" class="inline-error" role="alert"></p>
+      </div>
+      <div id="adapter-empty" class="empty-state" hidden>
+        <img src="icons/icon-128.png" alt="" />
+        <h3>从第一个适配器开始</h3>
+        <p>只需填写学校信息，然后编写课表脚本。</p>
+        <button id="empty-new" type="button">新建适配器</button>
+      </div>
+    </main>
+
+    <div id="workspace-shell" hidden>
+      <nav class="workspace-tabs" role="tablist" aria-label="开发工具分区">
+        <button id="tab-source" class="workspace-tab active" type="button" role="tab" aria-selected="true" aria-controls="panel-source" data-tab="source">
+          <span>源码</span>
+        </button>
+        <button id="tab-result" class="workspace-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-result" tabindex="-1" data-tab="result">
+          <span>测试</span>
+        </button>
+        <button id="tab-submit" class="workspace-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-submit" tabindex="-1" data-tab="submit">
+          <span>提交</span>
+        </button>
+      </nav>
+
+      <main class="workspace-main">
+        <section id="panel-source" class="workspace-panel" role="tabpanel" aria-labelledby="tab-source" data-panel="source">
+          <div class="source-toolbar">
+            <div class="source-context">
+              <button id="open-tutorial" class="icon-command help-command" type="button" aria-label="查看适配器开发教程" title="查看适配器开发教程">
+                <i data-lucide="circle-help" aria-hidden="true"></i>
+              </button>
+              <span id="runtime-dialect" class="runtime-dialect">小爱适配器</span>
+            </div>
+            <div class="source-actions">
+              <button id="open-portal" class="secondary" type="button"><i data-lucide="external-link" aria-hidden="true"></i>打开教务</button>
+              <button id="run" class="run-command" type="button" disabled aria-label="运行适配器">
+                <i class="run-start-icon" data-lucide="play" aria-hidden="true"></i>
+                <i class="run-stop-icon" data-lucide="square" aria-hidden="true"></i>
+                <span class="run-command-label">运行</span>
+              </button>
+            </div>
+          </div>
+          <div class="file-tabs" id="legacy-file-tabs" role="tablist" aria-label="源码文件">
+            <button type="button" class="file-tab active" data-file="provider">provider.js <span>获取页面</span></button>
+            <button type="button" class="file-tab" data-file="parser">parser.js <span>解析课程</span></button>
+            <button type="button" class="file-tab" data-file="timer">timer.js <span>读取时间</span></button>
+          </div>
+          <div class="editor-frame">
+            <section class="editor" id="triple-editor">
+              <div data-editor="provider"><div id="provider-editor" class="code-editor-host"></div><textarea id="provider-source" class="editor-model" aria-hidden="true"></textarea></div>
+              <div data-editor="parser" hidden><div id="parser-editor" class="code-editor-host"></div><textarea id="parser-source" class="editor-model" aria-hidden="true"></textarea></div>
+              <div data-editor="timer" hidden><div id="timer-editor" class="code-editor-host"></div><textarea id="timer-source" class="editor-model" aria-hidden="true"></textarea></div>
+            </section>
+            <section class="editor single" id="bridge-editor" hidden>
+              <div><div id="bridge-code-editor" class="code-editor-host"></div><textarea id="bridge-source" class="editor-model" aria-hidden="true"></textarea></div>
+            </section>
+            <footer class="editor-statusbar">
+              <span id="editor-position" aria-live="polite">第 1 行，第 1 列</span>
+              <span>UTF-8</span>
+              <span>JavaScript</span>
+              <button id="editor-settings-toggle" class="icon-command" type="button" aria-label="编辑器设置" title="编辑器设置" aria-haspopup="menu" aria-expanded="false">
+                <i data-lucide="settings-2" aria-hidden="true"></i>
+              </button>
+              <div id="editor-settings" class="editor-settings" role="menu" hidden>
+                <label>字号
+                  <select id="editor-font-size">
+                    <option value="12">12 px</option>
+                    <option value="13">13 px</option>
+                    <option value="14">14 px</option>
+                    <option value="16">16 px</option>
+                  </select>
+                </label>
+                <label class="editor-wrap-setting"><input id="editor-wrap" type="checkbox" />自动换行</label>
+              </div>
+            </footer>
+          </div>
+          <details id="error-details" class="error-details" hidden>
+            <summary>
+              <span>错误详情</span>
+              <button id="copy-errors" class="secondary copy-errors" type="button">
+                <i data-lucide="copy" aria-hidden="true"></i><span>复制</span>
+              </button>
+            </summary>
+            <ol id="issues"></ol>
+            <pre id="logs">工作台已就绪。</pre>
+          </details>
+          <button id="analyze" type="button" hidden>分析源码</button>
+        </section>
+
+        <section id="panel-result" class="workspace-panel" role="tabpanel" aria-labelledby="tab-result" data-panel="result" hidden>
+          <section class="test-section">
+            <div class="panel-heading result-heading">
+              <div><h2>课表结果</h2><p>请和教务页面里的真实课表逐项比较。</p></div>
+              <div class="result-tools">
+                <button id="open-week-view" class="secondary week-view-command" type="button" title="在新标签页预览课程表" disabled>
+                  <i data-lucide="external-link" aria-hidden="true"></i>课程表预览
+                </button>
+              </div>
+            </div>
+            <div id="result-json-panel" class="result-view result-json-panel">
+              <div id="result-code-editor" class="result-code-editor"></div>
+              <textarea id="result" class="editor-model" aria-hidden="true" readonly></textarea>
+            </div>
+            <section id="result-issues" class="result-issues" aria-live="polite" hidden>
+              <div class="result-issues-heading">
+                <h3 id="result-issues-title">需要处理</h3>
+                <span id="result-issues-count"></span>
+              </div>
+              <ul id="result-issue-list"></ul>
+            </section>
+            <label class="verification-check"><input id="verify-real" type="checkbox" disabled />与真实课表一致</label>
+          </section>
+
+          <section class="canary-panel" aria-labelledby="canary-title">
+            <div class="panel-heading canary-heading">
+              <div>
+                <h2 id="canary-title">App 实机测试</h2>
+                <p>测试平台已提交的当前 revision，不影响提交、审核或上线。</p>
+              </div>
+              <span id="canary-state" class="status-badge">未开始</span>
+            </div>
+            <p id="canary-guidance" class="canary-guidance">适配器提交平台后，可以生成 30 分钟测试码。</p>
+            <div id="canary-actions" class="canary-actions">
+              <button id="canary-start" type="button" disabled>生成测试码</button>
+              <button id="canary-close" class="secondary" type="button" hidden>关闭测试</button>
+            </div>
+            <div id="canary-session" class="canary-session" hidden>
+              <div class="canary-code-copy">
+                <span>测试码</span>
+                <strong id="canary-code">----</strong>
+                <button id="canary-copy" class="secondary" type="button"><i data-lucide="copy" aria-hidden="true"></i>复制测试码</button>
+              </div>
+              <dl class="canary-meta">
+                <div><dt>平台修订</dt><dd id="canary-revision">-</dd></div>
+                <div><dt>剩余时间</dt><dd id="canary-remaining">-</dd></div>
+                <div><dt>测试设备</dt><dd id="canary-redemptions">0 / 5</dd></div>
+              </dl>
+            </div>
+            <ul id="canary-results" class="canary-results" aria-live="polite"></ul>
+            <p id="canary-error" class="canary-error" role="alert"></p>
+          </section>
+
+        </section>
+
+        <section id="panel-submit" class="workspace-panel" role="tabpanel" aria-labelledby="tab-submit" data-panel="submit" hidden>
+          <ol class="flow-steps" aria-label="提交流程">
+            <li id="submit-flow-run"><span>1</span>运行脚本</li>
+            <li id="submit-flow-check"><span>2</span>核对课表</li>
+            <li id="submit-flow-submit"><span>3</span>提交审核</li>
+          </ol>
+          <section class="submit-summary">
+            <div class="panel-heading"><div><h2>确认适配器信息</h2><p>提交后平台会开始校验和审核。</p></div></div>
+            <dl id="submit-config-summary"></dl>
+            <p id="submission-gate" class="submit-gate"></p>
+            <button id="submit-new" class="submit-primary" type="button" disabled><i data-lucide="send" aria-hidden="true"></i>提交审核</button>
+            <button id="submit-revision" class="submit-primary" type="button" disabled hidden><i data-lucide="send" aria-hidden="true"></i>提交修改</button>
+          </section>
+          <section id="submission-detail" class="submission-detail" hidden>
+            <div><span>当前状态</span><strong id="submission-status"></strong></div>
+            <div><span>当前修订</span><strong id="submission-revision"></strong></div>
+            <p id="review-note"></p>
+            <ol id="revision-history" hidden></ol>
+          </section>
+          <button id="refresh-submission" type="button" hidden>刷新</button>
+          <pre id="descriptor-preview" hidden></pre>
+          <ul id="artifact-files" hidden></ul>
+        </section>
+      </main>
+    </div>
+
+    <section id="wizard" class="wizard" hidden aria-labelledby="wizard-title">
+      <h2 id="wizard-title" class="sr-only">新建适配器</h2>
+      <form id="wizard-step-one" class="wizard-form">
+        <label>适配器名字<input id="adapter-name" maxlength="200" placeholder="例如：清华大学教务" /></label>
+        <label>版本<input id="adapter-version" value="1.0.0" inputmode="text" /></label>
+        <fieldset>
+          <legend>适配器类型</legend>
+          <div class="segmented">
+            <button id="dialect-xiaoai" type="button" class="selected">小爱</button>
+            <button id="dialect-shiguang" type="button">拾光</button>
+          </div>
+          <select id="dialect" hidden><option value="xiaoai-legacy">小爱</option><option value="shiguang-bridge">拾光</option></select>
+        </fieldset>
+        <div class="school-field">
+          <label for="school-query">学校</label>
+          <div id="school-combobox" class="school-combobox">
+            <i data-lucide="search" aria-hidden="true"></i>
+            <input
+              id="school-query"
+              type="search"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-controls="school-options"
+              aria-expanded="false"
+              autocomplete="off"
+              placeholder="搜索或输入学校名称"
+            />
+            <button
+              id="school-dropdown-toggle"
+              class="icon-command school-dropdown-toggle"
+              type="button"
+              aria-label="展开学校列表"
+              title="展开学校列表"
+              tabindex="-1"
+            >
+              <i data-lucide="chevron-down" aria-hidden="true"></i>
+            </button>
+            <div id="school-options" class="school-options" role="listbox" hidden></div>
+          </div>
+          <p id="school-selection-hint" class="field-hint" aria-live="polite"></p>
+        </div>
+        <select id="school-select" hidden aria-hidden="true"></select>
+        <input id="candidate-toggle" type="checkbox" hidden />
+        <div id="candidate-fields" hidden>
+          <input id="candidate-name" maxlength="200" />
+          <input id="system-type" value="unknown" />
+        </div>
+        <label>教务地址<input id="portal-url" type="url" placeholder="https://jw.example.edu.cn" /></label>
+        <label>说明<textarea id="change-log" rows="4" maxlength="300" placeholder="对这个适配器的简单说明（选填）"></textarea><span class="counter"><b id="description-count">0</b>/300</span></label>
+        <p id="wizard-error" class="inline-error" role="alert"></p>
+        <button id="wizard-finish" class="wizard-primary" type="button">创建并开始编写</button>
+      </form>
+    </section>
+
+    <section class="technical-fields" hidden aria-hidden="true">
+      <select id="project-select"></select>
+      <button id="project-new" type="button"></button><button id="project-copy" type="button"></button>
+      <input id="package-file" type="file" /><button id="project-export" type="button"></button><button id="project-delete" type="button"></button>
+      <button id="wizard-cancel" type="button"></button>
+      <input id="adapter-id" /><input id="min-app-version" value="1.0.0" />
+      <input id="system-types" value="unknown" /><input id="origins" />
+      <select id="license"><option>Apache-2.0</option></select>
+      <input id="table-name" value="教务导入" /><input id="timezone" value="Asia/Shanghai" />
+      <select id="parser-mode"><option value="legacy-json">JSON</option><option value="legacy-cheerio">Cheerio</option></select>
+      <select id="timer-arguments"><option value="object">对象参数</option><option value="positional">位置参数</option></select>
+      <select id="timer-context"><option value="isolated">隔离</option><option value="portal">页面</option></select>
+      <div id="legacy-settings"></div><div id="shiguang-settings"></div>
+      <input id="tool-aischedule" type="checkbox" />
+      <input id="cap-dom" type="checkbox" checked /><input id="cap-fetch" type="checkbox" /><input id="cap-frames" type="checkbox" />
+      <input id="cap-page-timer" type="checkbox" /><input id="cap-storage" type="checkbox" /><input id="cap-mixed" type="checkbox" />
+      <select id="shiguang-category"><option value="BACHELOR_AND_ASSOCIATE">本专科</option></select>
+      <input id="source-url" /><input id="source-description" /><textarea id="license-text"></textarea>
+      <input id="published-adapter-id" /><input id="published-adapter-version" /><button id="load-remote" type="button"></button>
+      <button id="validate" type="button"></button><button id="download-json" type="button"></button><button id="copy-script" type="button"></button>
+    </section>
+
+    <iframe id="sandbox" src="sandbox.html" title="解析隔离运行时"></iframe>
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>
