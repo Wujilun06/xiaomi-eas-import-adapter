@@ -8,6 +8,9 @@ build/
 .env
 *.key
 
+# 隐私：单一隐私文件（本约定下所有隐私集中于此；本仓库无运行密钥，故不会创建该文件）
+private_config.json
+
 # 日志
 *.log
 
